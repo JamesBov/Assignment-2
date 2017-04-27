@@ -1,0 +1,120 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
+public class AStarSearch{
+
+	private Graph graph;
+	private int nodesExpanded = 0;
+	private int pathCost = 0;
+	
+	public AStarSearch(Graph g){
+		this.graph = g;
+	}
+		
+	public ArrayList<Town> search(Town v1, Town v2) {
+		return findPath(v1, v2);
+	}
+	
+	// Implementation of A* Search algorithm
+	// No heuristics yet
+	public ArrayList<Town> findPath(Town start, Town dest){
+		
+		//Strategy hueristic1 = new Heuristic();
+		
+		List<Town> closed = new ArrayList<Town>();
+		Queue<Town> queue = new PriorityQueue<Town>();
+		
+		queue.add(start);
+		
+		Map<Town, Integer> gScore = new HashMap<Town, Integer>();
+		gScore.put(start, 0);
+		
+		/*
+		Map<Town, Integer> fScore = new HashMap<Town, Integer>();
+		fScore.put(start, heuristicEst(start, dest));
+		*/
+		
+		Map<Town, Town> cameFrom = new HashMap<Town, Town>();
+		
+		while(!queue.isEmpty()){
+			this.nodesExpanded++;
+			Town curr = queue.poll();
+					
+			if(curr.equals(dest)){
+				this.pathCost = gScore.get(curr);
+				return reconstructPath(cameFrom, curr);
+			}
+			
+			closed.add(curr);
+			
+			
+			for(Edge edge : curr.getConnections()){
+				Town neighbour = edge.getNeighbour(curr);
+				
+				if(closed.contains(neighbour))
+					continue;
+				
+				int toDecideGScore = gScore.get(curr) + edge.getWeight();
+				curr.setD(toDecideGScore);
+				
+				if(!queue.contains(neighbour)){
+					
+					queue.add(neighbour);
+				}else if(toDecideGScore >= gScore.get(neighbour)){
+					//Path is not as good
+					continue;
+				}
+				
+				// Now if it IS a better path, update cameFrom map and gScore map
+				cameFrom.put(neighbour, curr);
+				gScore.put(neighbour, toDecideGScore);
+			}
+		}
+		//Fail
+		return null;
+	}
+	
+	/**
+	 * Reconstruct path by using the cameFrom map
+	 * @param cameFrom Map<V,V>
+	 * @param current V
+	 * @return reconstructed path
+	 */
+	public ArrayList<Town> reconstructPath(Map<Town, Town> cameFrom, Town current){
+		ArrayList<Town> path = new ArrayList<Town>();
+		
+
+		Town curr = current;
+		path.add(current);
+		
+		while(cameFrom.containsKey(curr)){
+			
+			curr = cameFrom.get(curr);
+			path.add(curr);
+		}
+		Collections.reverse(path);
+		return path;
+	}
+	
+	public int heuristicEst(Town start, Town dest){
+		return 0;
+	}
+
+	public int getNodesExpanded() {
+		return nodesExpanded;
+	}
+	
+	public int getPathCost(){
+		return pathCost;
+	}
+
+
+	
+	
+
+}
