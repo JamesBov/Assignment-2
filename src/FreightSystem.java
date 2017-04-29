@@ -15,6 +15,7 @@ public class FreightSystem {
 	static ArrayList<Town> townList = new ArrayList<Town>();
 	static ArrayList<Edge> edgeList = new ArrayList<Edge>();
 	static int nodesExpanded = 0;
+	static int cost = 0;
 	static Graph graph = null;
 	
 	public static void main(String[] args) {		
@@ -39,32 +40,10 @@ public class FreightSystem {
 	      // Send to input handler
 	      input_handler(input);
 	      generateGraph();
-	      //showJobList();
-	      //showTownList();
-	      //collectJobData();
 	      pathFind();
-	      //showMap();
-	      
-	      
-	      
-	  
-	      
 	}
 	
-	/**
-	 * Go through each job, and calculate cost of each job
-	 * Requires use of A*
-	 */
-	public static void collectJobData(){
-		for(Job j : jobList){
-			Town src = j.getFrom();
-			Town dest = j.getTo();
-			
-			AStarSearch aStar = new AStarSearch(graph);
-			j.setPath(aStar.findPath(src, dest));
-			j.setGCost(aStar.getPathCost() + dest.getUnloadCost()); 
-		}
-	}
+	
 	/**
 	 * Find optimal path
 	 * No optimisation of job order yet
@@ -72,12 +51,16 @@ public class FreightSystem {
 	public static void pathFind(){
 		ArrayList<Job> jobOrder = discoverJobOrder();
 		ArrayList<Job> path = constructPath(jobOrder);
+		calculateCost(path);
+		
 		System.out.println(nodesExpanded);
+		System.out.println("Cost = " + cost);
 		
 		for(Job j : path){
 			System.out.println(j.toString() + " " + j.getFinalCost());
 		}
 	}
+	
 	
 	public static ArrayList<Job> constructPath(ArrayList<Job> jobOrder){
 
@@ -106,20 +89,21 @@ public class FreightSystem {
 		return path;
 	}
 	
+	public static void calculateCost(ArrayList<Job> path){
+		for(Job j : path){
+			cost += j.getFinalCost();
+		}
+	}
+	
 	public static ArrayList<Job> discoverJobOrder(){
 		Queue<Job> jobQueue = new PriorityQueue<Job>();	
 		ArrayList<Job> completed = new ArrayList<Job>();
 		ArrayList<Job> order = new ArrayList<Job>();
 
 		Town reference = getStartTown();
-		Job jobPoll;
+		Job jobPoll = null;
 		
-		Strategy referenceD = new Heuristic();
-		referenceD.setHeuristic(reference, graph, jobList);
-		
-		for(Job j : jobList){
-			jobQueue.add(j);
-		}
+		searchJobOrder(jobQueue, reference);
 		
 		while(!jobQueue.isEmpty()){
 						
@@ -128,25 +112,41 @@ public class FreightSystem {
 			if(completed.contains(jobPoll)){
 				continue;
 			}
+				
+			reference = jobPoll.getTo();			
+			searchJobOrder(jobQueue, reference);
 			
-			nodesExpanded++;
-			
-			//System.out.println("----Polled----- " + jobPoll.toString());
-			
-			reference = jobPoll.getTo();
-			
-			// Modify jobList according to reference
-			referenceD.setHeuristic(reference, graph, jobList);
-			nodesExpanded += referenceD.getNodesExpanded();
-			
-			// Add a new modified list to queue
-			for(Job j : jobList){
-				jobQueue.add(j);
-			}	
 			completed.add(jobPoll);
 			order.add(jobPoll);
 		}
 		return order;
+	}
+	
+	public static void searchJobOrder(Queue<Job> jobQueue, Town reference){
+		
+		for(Job j : jobList){
+			AStarSearch searchInstance = new AStarSearch(graph);
+			new Dijkstras(searchInstance);
+			
+			searchInstance.search(reference, j.getFrom());			
+			int lowerB = searchInstance.getPathCost();
+			nodesExpanded += searchInstance.getNodesExpanded();
+			
+
+			searchInstance.search(j.getFrom(), j.getTo());
+			int upperB = searchInstance.getPathCost();	
+			nodesExpanded += searchInstance.getNodesExpanded();
+			
+			j.setPathCost(upperB);
+
+			int distance = upperB + lowerB;
+			j.setGCost(lowerB);
+			j.setHeuristicCost(distance);
+		}
+
+		for(Job j : jobList){
+			jobQueue.add(j);
+		}
 	}
 	
 	

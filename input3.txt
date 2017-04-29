@@ -1,0 +1,30 @@
+#Min cost: 1700
+Cost 100 Sydney A
+Cost 100 Sydney B
+Cost 100 A B
+Cost 100 A C
+Cost 100 A D
+Cost 100 B C
+Cost 100 C D
+Cost 100 C E
+Cost 100 C G
+Cost 100 D F
+Cost 100 D I
+Cost 100 F I
+Cost 100 G I
+Cost 100 G J
+Cost 100 E J
+Cost 100 E H
+Cost 100 J H
+Cost 100 J K
+Cost 100 H K
+
+Job A B
+Job C B
+Job F I
+Job G C
+Job K J
+Job F D
+Job G J
+Job A C
+Job C A

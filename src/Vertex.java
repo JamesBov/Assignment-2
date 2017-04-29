@@ -3,10 +3,9 @@ import java.util.ArrayList;
 public class Vertex{
 	private ArrayList<Edge> connections;
 	private int unloadCost;
-	
-	private int d; // distance from the source
-	private int h; // heuristic of destination
+	private int g;
 	private int f; // f(x) = distance(x) + h(x)
+	private int h;
 	
 	public Vertex(int unloadCost){
 		this.setUnloadCost(unloadCost);
@@ -48,34 +47,26 @@ public class Vertex{
 		this.unloadCost = unloadCost;
 	}
 
-	public int getD() {
-		return d;
-	}
-
-	public void setD(int d) {
-		this.d = d;
-	}
-
-	public int getH() {
-		return h;
-	}
-
-	public void setH(int h) {
-		this.h = h;
-	}
-
-	public int getF() {
-		return f;
-	}
-
 	public void setF(int f) {
 		this.f = f;
 	}
+	
+	public void setG(int g) {
+		this.g = g;
+	}
+	
+	public void setH(int h){
+		this.h = h;
+	}
+	
+	public void calculateF(){
+		this.f = g + h;
+	}
 
 	public int compareTo(Vertex v) {
-		if(this.d < v.d){
+		if(this.f < v.f){
 			return -1;
-		}else if(this.d > v.d){
+		}else if(this.f > v.f){
 			return 1;
 		}else{
 			return 0;

@@ -1,0 +1,31 @@
+#Min cost: 1300
+Unloading 0 A 
+Unloading 0 Sydney
+Unloading 0 B
+Unloading 0 C
+Unloading 0 D
+Unloading 0 E
+Unloading 0 F
+Unloading 0 G
+
+Cost 100 Sydney A
+Cost 100 Sydney B
+Cost 100 Sydney C
+Cost 100 A B
+Cost 100 A D
+Cost 100 B C
+Cost 100 B D
+Cost 100 B E
+Cost 100 C E
+Cost 100 D F
+Cost 100 D G
+Cost 100 E F
+Cost 100 F G
+
+Job A Sydney
+Job B C
+Job D G
+Job E B
+Job F G
+Job E C
+Job D F

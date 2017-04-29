@@ -60,11 +60,9 @@ public class Job implements Comparable<Job>{
 		this.gCost = cost;
 	}
 	
-	public void calcTotalCost(){
-		this.totalCost = gCost + heuristicCost;
-	}
 	
 	public int getTotalCost(){
+		this.totalCost = gCost + heuristicCost;
 		return totalCost;
 	}
 	
@@ -86,7 +84,9 @@ public class Job implements Comparable<Job>{
 	}
 
 	public int getFinalCost() {
-		return pathCost + to.getUnloadCost();
+		if(job == true)
+			return pathCost + to.getUnloadCost();
+		return pathCost;
 	}
 
 
