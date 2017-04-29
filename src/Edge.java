@@ -1,8 +1,10 @@
 
-public class Edge{ //implements Comparable<Edge> {
+public class Edge implements Comparable<Edge> {
 	private Town t1, t2;
 	private int weight;
 	
+	
+	//Edge tail -> head
 	public Edge(Town t1,Town t2, int weight){
 		this.t1 = t1;
 		this.t2 = t2;
@@ -57,7 +59,7 @@ public class Edge{ //implements Comparable<Edge> {
 
 	@Override
 	public String toString() {
-		return "Edge [t1=" + t1 + ", t2=" + t2 + ", weight=" + weight + "]";
+		return t1.getName() + " to " + t2.getName();
 	}
 	
 	/**
@@ -67,7 +69,7 @@ public class Edge{ //implements Comparable<Edge> {
 		return(t1.getName() + t2.getName()).hashCode();
 	}
 
-	/*
+
 	@Override
 	public int compareTo(Edge e) {
 		if(this.equals(e)){
@@ -76,6 +78,5 @@ public class Edge{ //implements Comparable<Edge> {
 			return 1;
 		}
 	}
-	*/
 	
 }

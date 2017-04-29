@@ -13,95 +13,76 @@ public class AStarSearch{
 	private int pathCost = 0;
 	private ArrayList<Town> path = null;
 	private Strategy strategy;
+	private ArrayList<Edge> jobList;
+	private ArrayList<State> stateList;
 	
-	public AStarSearch(Graph g){
+	public AStarSearch(Graph g, ArrayList<Edge> jobList){
 		this.graph = g;
 		this.path = new ArrayList<Town>();
+		this.jobList = jobList;
 	}
 	
-	// Implementation of A* Search algorithm
-	public ArrayList<Town> findPath(Town start, ArrayList<Job> jobList){
+	
+	/**
+	 * Take the starting point at Sydney
+	 * Execute A* Search until we arrive at a goal state that contains all the jobs
+	 * @param start
+	 * @return Optimal path
+	 */
+	public ArrayList<Edge> findPath(Town start){
 		
 		List<Town> closed = new ArrayList<Town>();
-		Queue<Town> queue = new PriorityQueue<Town>();
+		Queue<State> queue = new PriorityQueue<State>();
 		
-		queue.add(start);
+		//Initialise a dummy start state
+		State startState = new State();
+		startState.setfCost(0);
+		startState.addEdge(new Edge(new Town("Dummy", 0), start, 0));
 		
-		Map<Town, Integer> gScore = new HashMap<Town, Integer>();
-		gScore.put(start, 0);
-		
-		
-		Map<Town, Integer> fScore = new HashMap<Town, Integer>();
-		fScore.put(start, heuristicEst(start, dest));
-		start.setF(fScore.get(start));
-		
-		
-		Map<Town, Town> cameFrom = new HashMap<Town, Town>();
+		queue.add(startState);
 		
 		while(!queue.isEmpty()){
-			Town curr = queue.poll();
+			
+			State curr = queue.poll();
+			
 			nodesExpanded++;
 
-			if(curr.equals(dest)){
-				this.pathCost = gScore.get(curr);
-				return reconstructPath(cameFrom, curr);
+			if(isSubset(jobList, curr)){
+				return curr.getStepsTaken();
 			}
-			
-			closed.add(curr);
-			
-			
-			for(Edge edge : curr.getConnections()){
-				Town neighbour = edge.getNeighbour(curr);
+						
+			for(Edge edge : curr.getStateHead().getConnections()){	
+					
+				State newState = new State();
 				
-				
-				if(closed.contains(neighbour))
-					continue;
-				
-				int toDecideGScore = gScore.get(curr) + edge.getWeight();
-				curr.setG(toDecideGScore);
-				
-				if(!queue.contains(neighbour)){
-					queue.add(neighbour);
-				}else if(toDecideGScore >= gScore.get(neighbour)){
-					//Path is not as good
-					continue;
+				//Handles the dummy intial start state
+				if(curr.equals(startState) && edge.getHead().equals(start)){
+					newState.addEdge(edge);
+				}else{
+					newState.copyStepsTaken(curr.getStepsTaken());
+					
+					if(newState.getStateHead().equals(edge.getTail())){
+						newState = null;
+						continue;
+					}
+					newState.addEdge(edge);
 				}
 				
-				// Now if it IS a better path, update cameFrom map and gScore map
-				cameFrom.put(neighbour, curr);
-				gScore.put(neighbour, toDecideGScore);
-				
-				int f = gScore.get(neighbour) + heuristicEst(neighbour, dest);
-				fScore.put(neighbour, f);
-				neighbour.setF(f);
+				newState.setgCost(curr.getgCost() + edge.getWeight());
+				newState.setfCost(newState.getgCost() + 0);
+
+				if(!queue.contains(newState)){
+					queue.add(newState);
+				}
 			}
+			
+			
 		}
 		//Fail
 		return null;
-	}
-	
-	/**
-	 * Reconstruct path by using the cameFrom map
-	 * @param cameFrom Map<V,V>
-	 * @param current V
-	 * @return reconstructed path
-	 */
-	public ArrayList<Town> reconstructPath(Map<Town, Town> cameFrom, Town current){
-		ArrayList<Town> path = new ArrayList<Town>();
 		
-
-		Town curr = current;
-		path.add(current);
-		
-		while(cameFrom.containsKey(curr)){
-			
-			curr = cameFrom.get(curr);
-			path.add(curr);
-		}
-		Collections.reverse(path);
-		return path;
 	}
-	
+		
 	public void setStrategy(Strategy s){
 		this.strategy = s;
 	}
@@ -113,16 +94,7 @@ public class AStarSearch{
 	public int heuristicEst(Town start, Town dest){
 		//Use dijkstra's
 		int cost = 0;
-		
-		if(this.strategy instanceof Dijkstras){
-			cost = 0;
-		}else if(this.strategy instanceof StraightLineHeuristic){
-			AStarSearch searchInstance = new AStarSearch(graph);
-			new Dijkstras(searchInstance);
-			
-			searchInstance.search(start, dest);			
-			cost = searchInstance.getPathCost();
-		}
+
 		return cost;
 	}
 
@@ -132,5 +104,17 @@ public class AStarSearch{
 	
 	public int getPathCost(){
 		return pathCost;
+	}
+	
+	private boolean isSubset(ArrayList<Edge> jobList, State state){
+		boolean status = false;
+		for(Edge job : jobList){
+			if(state.getStepsTaken().contains(job)){
+				status = true;
+			}else{
+				return false;
+			}
+		}
+		return status;
 	}
 }

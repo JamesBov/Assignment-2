@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class FreightSystem {
 	
-	static ArrayList<Job> jobList = new ArrayList<Job>();
+	static ArrayList<Edge> jobList = new ArrayList<Edge>();
 	static ArrayList<Town> townList = new ArrayList<Town>();
 	static ArrayList<Edge> edgeList = new ArrayList<Edge>();
 	static int nodesExpanded = 0;
@@ -49,118 +49,43 @@ public class FreightSystem {
 	 * No optimisation of job order yet
 	 */
 	public static void pathFind(){
-		/*
-		
-		ArrayList<Job> path = constructPath(jobOrder);
-		calculateCost(path);
-		
-		System.out.println(nodesExpanded);
-		System.out.println("Cost = " + cost);
-		
-		for(Job j : path){
-			System.out.println(j.toString() + " " + j.getFinalCost());
-		}
-		*/
-		
-		
-		AStarSearch searchInstance = new AStarSearch(graph);
-		searchInstance.setStrategy(new StraightLineHeuristic());
-		ArrayList<Town> path = searchInstance.findPath(getStartTown(), jobList);
-		/*
-		Context context = new Context(new StraightLineHeuristic());
-		*/
-		
-	}
-	
-	
-	public static ArrayList<Job> constructPath(ArrayList<Job> jobOrder){
-
-		ArrayList<Job> path = new ArrayList<Job>();
-		Town prev = null;
-		AStarSearch searchInstance = new AStarSearch(graph);
-		
-		
-		for(Job j : jobOrder){
-			if(prev == null){
-				prev = j.getTo();
-				path.add(j);
-				continue;
-			}else if(!prev.equals(j.getFrom())){
-				Job newJob = new Job(prev, j.getFrom(), false);
-				newJob.setPath(searchInstance.search(prev, j.getFrom()));
-				newJob.setPathCost(searchInstance.getPathCost());
-				path.add(newJob);
-				path.add(j);
-				prev = j.getTo();
-			}else{
-				path.add(j);
-				prev = j.getTo();
-			}
-		}
-		return path;
-	}
-	
-	public static void calculateCost(ArrayList<Job> path){
-		for(Job j : path){
-			cost += j.getFinalCost();
-		}
-	}
-	
-	public static ArrayList<Job> discoverJobOrder(){
-		Queue<Job> jobQueue = new PriorityQueue<Job>();	
-		ArrayList<Job> completed = new ArrayList<Job>();
-		ArrayList<Job> order = new ArrayList<Job>();
-
-		Town reference = getStartTown();
-		Job jobPoll = null;
-		
-		searchJobOrder(jobQueue, reference);
-		
-		while(!jobQueue.isEmpty()){
-						
-			jobPoll = jobQueue.poll();
-			
-			if(completed.contains(jobPoll)){
-				continue;
-			}
 				
-			reference = jobPoll.getTo();			
-			searchJobOrder(jobQueue, reference);
-			
-			completed.add(jobPoll);
-			order.add(jobPoll);
-		}
-		return order;
-	}
-	
-	public static void searchJobOrder(Queue<Job> jobQueue, Town reference){
+		AStarSearch searchInstance = new AStarSearch(graph, jobList);
+		ArrayList<Edge> path = searchInstance.findPath(getStartTown());
 		
-		for(Job j : jobList){
-			AStarSearch searchInstance = new AStarSearch(graph);
-			new Dijkstras(searchInstance);
-			
-			searchInstance.search(reference, j.getFrom());			
-			int lowerB = searchInstance.getPathCost();
-			nodesExpanded += searchInstance.getNodesExpanded();
-			
-
-			searchInstance.search(j.getFrom(), j.getTo());
-			int upperB = searchInstance.getPathCost();	
-			nodesExpanded += searchInstance.getNodesExpanded();
-			
-			j.setPathCost(upperB);
-
-			int distance = upperB + lowerB;
-			j.setGCost(lowerB);
-			j.setHeuristicCost(distance);
+		if(path == null){
+			System.out.println("No Solution");
+			return;
 		}
-
-		for(Job j : jobList){
-			jobQueue.add(j);
-		}
+		System.out.println(searchInstance.getNodesExpanded());
+		outputHandler(path);	
 	}
 	
-	
+	public static void outputHandler(ArrayList<Edge> path){
+		
+		int totalCost = 0;
+		ArrayList<String> output = new ArrayList<String>();
+		
+		for(Edge e : path){
+			if(jobList.contains(e)){
+				int jobCost = e.getTail().getUnloadCost() + e.getWeight();
+				output.add("Job " + e);
+				totalCost += jobCost;
+			}else{
+				output.add("Empty " + e);
+				totalCost += e.getWeight();
+			}
+		}
+		
+		System.out.println(totalCost);
+		
+		for(String s : output){
+			System.out.println(s);
+		}
+		
+		
+	}
+		
 	public static Town getStartTown(){
 		for(Town t : townList){
 			if(t.getName().equals("Sydney")){
@@ -249,11 +174,14 @@ public class FreightSystem {
 		}
 		Edge newEdge = new Edge(headV, tailV, travelCost);
 		edgeList.add(newEdge);
-		
+		Edge newEdgeC = new Edge(tailV, headV, travelCost);
+		edgeList.add(newEdgeC);
+		/*
 		for(Job j : jobList){
 			if(j.getFrom().equals(headV) && j.getTo().equals(tailV))
 				return;
 		}
+		*/
 		//Job newJob = new Job(headV, tailV, false);
 		//jobList.add(newJob);
 	}
@@ -276,8 +204,12 @@ public class FreightSystem {
 				tailV = town;
 			}
 		}
-		Job newJob = new Job(headV, tailV, true);
-		jobList.add(newJob);	
+		for(Edge e : edgeList){
+			if(e.getHead().equals(headV) && e.getTail().equals(tailV)){
+				jobList.add(e);
+				break;
+			}
+		}
 	}
 	
 	public static void generateGraph(){
