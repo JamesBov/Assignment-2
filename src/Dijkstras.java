@@ -2,13 +2,16 @@
 
 public class Dijkstras implements Strategy {
 	
+	private AStarSearch searchInstance;
+	
 	public Dijkstras(AStarSearch searchInstance) {
-		setHeuristic(searchInstance);
+		this.searchInstance = searchInstance;
 	}
 
 	@Override
-	public void setHeuristic(AStarSearch searchInstance) {
-		searchInstance.setHeuristic(this);
+	public void calculateHeuristic(Town curr, Job j) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

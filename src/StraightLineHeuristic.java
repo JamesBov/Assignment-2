@@ -1,13 +1,11 @@
 
 
 public class StraightLineHeuristic implements Strategy{
-
-	public StraightLineHeuristic(AStarSearch searchInstance){
-		setHeuristic(searchInstance);
-	}
+	
+	//private AStarSearch searchInstance;
 
 	@Override
-	public void setHeuristic(AStarSearch searchInstance) {
-		searchInstance.setHeuristic(this);
+	public void calculateHeuristic(Town curr, Job j){
+		
 	}
 }

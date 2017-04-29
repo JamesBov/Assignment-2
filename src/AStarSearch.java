@@ -16,15 +16,11 @@ public class AStarSearch{
 	
 	public AStarSearch(Graph g){
 		this.graph = g;
-		path = new ArrayList<Town>();
-	}
-		
-	public ArrayList<Town> search(Town v1, Town v2) {
-		return findPath(v1, v2);
+		this.path = new ArrayList<Town>();
 	}
 	
 	// Implementation of A* Search algorithm
-	public ArrayList<Town> findPath(Town start, Town dest){
+	public ArrayList<Town> findPath(Town start, ArrayList<Job> jobList){
 		
 		List<Town> closed = new ArrayList<Town>();
 		Queue<Town> queue = new PriorityQueue<Town>();
@@ -106,7 +102,7 @@ public class AStarSearch{
 		return path;
 	}
 	
-	public void setHeuristic(Strategy s){
+	public void setStrategy(Strategy s){
 		this.strategy = s;
 	}
 	
@@ -117,8 +113,6 @@ public class AStarSearch{
 	public int heuristicEst(Town start, Town dest){
 		//Use dijkstra's
 		int cost = 0;
-		
-		
 		
 		if(this.strategy instanceof Dijkstras){
 			cost = 0;
