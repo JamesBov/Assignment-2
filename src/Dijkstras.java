@@ -10,5 +10,6 @@ public class Dijkstras implements Strategy {
 	public void setHeuristic(AStarSearch searchInstance) {
 		searchInstance.setHeuristic(this);
 	}
+
 	
 }
