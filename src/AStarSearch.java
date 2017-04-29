@@ -122,10 +122,9 @@ public class AStarSearch{
 		
 		if(this.strategy instanceof Dijkstras){
 			cost = 0;
-		}else if(this.strategy instanceof StraightLineHeuristic){
+		}else{
 			AStarSearch searchInstance = new AStarSearch(graph);
 			new Dijkstras(searchInstance);
-			
 			searchInstance.search(start, dest);			
 			cost = searchInstance.getPathCost();
 		}
