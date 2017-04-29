@@ -49,7 +49,8 @@ public class FreightSystem {
 	 * No optimisation of job order yet
 	 */
 	public static void pathFind(){
-		ArrayList<Job> jobOrder = discoverJobOrder();
+		/*
+		
 		ArrayList<Job> path = constructPath(jobOrder);
 		calculateCost(path);
 		
@@ -59,6 +60,16 @@ public class FreightSystem {
 		for(Job j : path){
 			System.out.println(j.toString() + " " + j.getFinalCost());
 		}
+		*/
+		
+		
+		AStarSearch searchInstance = new AStarSearch(graph);
+		searchInstance.setStrategy(new StraightLineHeuristic());
+		ArrayList<Town> path = searchInstance.findPath(getStartTown(), jobList);
+		/*
+		Context context = new Context(new StraightLineHeuristic());
+		*/
+		
 	}
 	
 	
