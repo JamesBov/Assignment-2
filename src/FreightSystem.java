@@ -49,16 +49,19 @@ public class FreightSystem {
 	 * No optimisation of job order yet
 	 */
 	public static void pathFind(){
-		ArrayList<Job> jobOrder = discoverJobOrder();
-		ArrayList<Job> path = constructPath(jobOrder);
-		calculateCost(path);
+		//ArrayList<Job> jobOrder = discoverJobOrder();
+		//ArrayList<Job> path = constructPath(jobOrder);
+		//calculateCost(path);
 		
-		System.out.println(nodesExpanded);
-		System.out.println("Cost = " + cost);
 		
-		for(Job j : path){
+		
+		System.out.println(nodesExpanded + " " + "nodes expanded");
+		System.out.println("cost = " + cost);
+		
+		/*for(Job j : path){
 			System.out.println(j.toString() + " " + j.getFinalCost());
 		}
+		*/
 	}
 	
 	
