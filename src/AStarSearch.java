@@ -14,7 +14,6 @@ public class AStarSearch{
 	private ArrayList<Town> path = null;
 	private Strategy strategy;
 	private ArrayList<Edge> jobList;
-	private ArrayList<State> stateList;
 	
 	public AStarSearch(Graph g, ArrayList<Edge> jobList){
 		this.graph = g;
@@ -44,7 +43,7 @@ public class AStarSearch{
 		while(!queue.isEmpty()){
 			
 			State curr = queue.poll();
-			
+			//System.out.println(curr.getStepsTaken());
 			nodesExpanded++;
 
 			if(isSubset(jobList, curr)){

@@ -4,7 +4,7 @@ public class Edge implements Comparable<Edge> {
 	private int weight;
 	
 	
-	//Edge tail -> head
+	//Edge t1 -> t2
 	public Edge(Town t1,Town t2, int weight){
 		this.t1 = t1;
 		this.t2 = t2;
@@ -29,10 +29,12 @@ public class Edge implements Comparable<Edge> {
 		return neighbour;
 	}
 	
+	//t1(head)
 	public Town getHead(){
 		return t1;
 	}
-	
+
+	//t2(tail)
 	public Town getTail(){
 		return t2;
 	}
@@ -50,7 +52,8 @@ public class Edge implements Comparable<Edge> {
 	}
 	
 	public boolean equals(Edge other){
-		if(this.equals(other)){
+
+		if(this.getHead().equals(other.getHead()) && this.getTail().equals(other.getTail())){
 			return true;
 		}else{
 			return false;
