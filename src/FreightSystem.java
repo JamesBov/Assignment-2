@@ -8,13 +8,26 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+/**
+ * Implementation of the A* search algorithm via strategy pattern in finding the cheapest path 
+ *  in a given graph satisfying a list of paths (Jobs) that must be taken. 
+ * Initial location is also given
+ * 
+ * For details on Heuristic view the heuristic class.
+ * 
+ * 
+ * COMP2911 Assignment 2
+ * @author James Zhang
+ * @zID: z5062479 
+ *
 
+ */
 public class FreightSystem {
 	
 	static ArrayList<Edge> jobList = new ArrayList<Edge>();
 	static ArrayList<Town> townList = new ArrayList<Town>();
 	static ArrayList<Edge> edgeList = new ArrayList<Edge>();
-	static int nodesExpanded = 0;
+	static boolean hasSolution = true;
 	static int cost = 0;
 	static Graph graph = null;
 	
@@ -45,26 +58,36 @@ public class FreightSystem {
 	
 	
 	/**
-	 * Find optimal path
-	 * No optimisation of job order yet
+	 * Calls the strategy pattern via the searchContext
+	 * Collects data and sends to outputHandler
+	 * Ensures there is a valid path, i.e. all jobs are edges in edgeList
 	 */
 	public static void pathFind(){
-				
-		AStarSearch searchInstance = new AStarSearch(graph, jobList);
-		ArrayList<Edge> path = searchInstance.findPath(getStartTown());
 		
-		if(path == null){
+		if(hasSolution() == false){
 			System.out.println("No Solution");
 			return;
 		}
-		System.out.println(searchInstance.getNodesExpanded());
-		outputHandler(path);	
+		
+		SearchContext context = new SearchContext(new StraightLineStrategy());
+
+		context.executeStrategy(jobList, getStartTown());
+		ArrayList<Edge> path = context.getPath();
+		int nodesExpanded = context.getExpandedNodes();
+		
+		outputHandler(nodesExpanded, path);	
 	}
 	
-	public static void outputHandler(ArrayList<Edge> path){
+	/**
+	 * Receives data and prints accordingly to the spec
+	 * @param integer - nodesExpanded
+	 * @param ArrayList of edges - path
+	 */
+	public static void outputHandler(int nodesExpanded, ArrayList<Edge> path){
 		
 		int totalCost = 0;
 		ArrayList<String> output = new ArrayList<String>();
+		
 		
 		for(Edge e : path){
 			if(jobList.contains(e)){
@@ -77,15 +100,21 @@ public class FreightSystem {
 			}
 		}
 		
-		System.out.println(totalCost);
 		
+		// Print
+		System.out.println(nodesExpanded + " " + "nodes expanded");
+		System.out.println("cost = " + totalCost);
 		for(String s : output){
 			System.out.println(s);
 		}
-		
-		
 	}
 		
+	/**
+	 * Get the starting location for the search
+	 * Spec sets it as "Sydney"
+	 * Returns town under "Sydney"
+	 * @return
+	 */
 	public static Town getStartTown(){
 		for(Town t : townList){
 			if(t.getName().equals("Sydney")){
@@ -96,32 +125,13 @@ public class FreightSystem {
 	}
 	
 	
-	
-	public static void showPath(ArrayList<Town> path){
-		System.out.println("~~~PATH~~~");
-		String output = "";
-		
-		for(Town t : path){
-			if(path.lastIndexOf(t) == path.size() - 1){
-				output += t.getName();
-				break;
-			}
-			output += t.getName() + " ---> ";
-		}
-		
-		System.out.println(output);
-	}
-
 	/**
 	 * Extract/Declaration/Cancellation/Change details via regex
 	 * Handles these details in their respective handlers
 	 * @param input
 	 */
 	public static void input_handler(ArrayList<String> input){
-		
-		// Handles duplicate locations, assuming ordered
-		//Depot previousDepot = null;
-		
+				
 		for(String element : input){
 			
 			// Extract and generate Vertices unloading cost
@@ -138,12 +148,14 @@ public class FreightSystem {
 			if(element.matches("^Cost.*")){
 				costHandler(element);
 			}
-
-
 		}	
 	}
 	
-	
+	/**
+	 * Handles input involving unload cost
+	 * Initializes towns and sets unload costs
+	 * @param String with associated data
+	 */
 	public static void unloadHandler(String element) {
 		String[] parts = element.split(Pattern.quote(" "));
 		
@@ -153,6 +165,11 @@ public class FreightSystem {
 		townList.add(newTown);
 	}
 	
+	/**
+	 * Handles input involving edges
+	 * Initializes edges and sets the distance costs
+	 * @param String with associated data
+	 */
 	public static void costHandler(String element){
 		String[] parts = element.split(Pattern.quote(" "));
 		
@@ -174,18 +191,18 @@ public class FreightSystem {
 		}
 		Edge newEdge = new Edge(headV, tailV, travelCost);
 		edgeList.add(newEdge);
+		
+		//Undirected graph, so generate complement edge
 		Edge newEdgeC = new Edge(tailV, headV, travelCost);
 		edgeList.add(newEdgeC);
-		/*
-		for(Job j : jobList){
-			if(j.getFrom().equals(headV) && j.getTo().equals(tailV))
-				return;
-		}
-		*/
-		//Job newJob = new Job(headV, tailV, false);
-		//jobList.add(newJob);
 	}
 	
+	/**
+	 * Handles input involving jobs
+	 * Treated similarly as edges however with weight cost
+	 * Added to jobList afterwards
+	 * @param String with associated data
+	 */
 	public static void jobHandler(String element){
 		String[] parts = element.split(Pattern.quote(" "));
 		
@@ -207,44 +224,89 @@ public class FreightSystem {
 		for(Edge e : edgeList){
 			if(e.getHead().equals(headV) && e.getTail().equals(tailV)){
 				jobList.add(e);
+				hasSolution = true;
 				break;
+			}else{
+				hasSolution = false;
 			}
 		}
 	}
 	
+
+	
+	/**
+	 * Generate the graph from the input
+	 */
 	public static void generateGraph(){
 		graph = newGraph();
 		generateEdges(graph);
 	}
 	
+	/**
+	 * Initializes a graph from a list of towns (Vertices)
+	 * @return
+	 */
 	public static Graph newGraph(){
 		Graph newGraph = new Graph(townList);
 		return newGraph;
 	}
 	
+	/**
+	 * Generate all edges from the edgeList
+	 * @param g
+	 */
 	public static void generateEdges(Graph g){
 		for(Edge edge : edgeList){
 			g.addEdge(edge);
 		}
 	}
 	
-	public static void showTownList(){
-		for(Town t : townList){
-			System.out.println(t.getName());
-		}
-	}
+	private static ArrayList<Town> visited = new ArrayList<Town>();
 	
-	public static void showJobList(){
-		for(Job j : jobList){
-			System.out.println(j.toString());
-		}
-	}
-	
-	public static void showMap(){
-		System.out.println(graph.getVertexKeys());
+	/**
+	 * Perform a DFS to ensure that there are no disconnected subgraphs
+	 * Check otherwise, and ensure no jobs are in the disconnected regions
+	 * @param curr
+	 */
+	static void DFS(Town curr){
+		visited.add(curr);
 		
-		for(Edge key : graph.getEdgeKeys()){
-			System.out.println(key);
+		for(Edge connection : curr.getAllConnections()){
+			Town neighbour = connection.getNeighbour(curr);
+			
+			if(!visited.contains(neighbour)){
+				DFS(neighbour);
+			}
 		}
+	}
+	
+	/**
+	 * Checks if graph is connected, no solutions if disconnected with jobs in different subgraphs
+	 * @param graph
+	 * @return boolean
+	 */
+	static boolean hasSolution(){
+		boolean flag = true;
+		DFS(getStartTown());
+		
+		if(visited.size() == townList.size()){
+			flag = true;
+		}else{
+			ArrayList<Town> checkList = new ArrayList<Town>(townList);
+			
+			for(Town town : visited){
+				checkList.remove(town);
+			}
+			
+			// unvisited nodes remain in checkList
+			// check if any jobs are inside this list
+			for(Edge j : jobList){
+				if(checkList.contains(j.getHead()) || checkList.contains(j.getTail())){
+					flag = false;
+					break;
+				}
+			}
+		}
+		return flag;	
 	}
 }

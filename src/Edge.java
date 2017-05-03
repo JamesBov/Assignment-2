@@ -1,21 +1,73 @@
-
-public class Edge implements Comparable<Edge> {
+/**
+ * 
+ * Edge class that stores the vertex (Towns) associated with the edge and 
+ * the cost weight to travel across
+ *
+ */
+public class Edge{
 	private Town t1, t2;
 	private int weight;
 	
 	
-	//Edge t1 -> t2
-	public Edge(Town t1,Town t2, int weight){
+	/**
+	 * Constructor for initialising a new edge
+	 * @param t1 - Head vertex
+	 * @param t2 - Tail vertex
+	 * @param integer weight
+	 */
+	public Edge(Town t1, Town t2, int weight){
 		this.t1 = t1;
 		this.t2 = t2;
 		this.weight = weight;
 	}
 	
 	/**
-	 * Gets the neighbouring town if exists
-	 * @param reference
-	 * @return
+	 * @return vertex associated with the "head" of the edge
 	 */
+	public Town getHead(){
+		return t1;
+	}
+
+	/**
+	 * @return vertex associated with the "tail" of the edge
+	 */
+	public Town getTail(){
+		return t2;
+	}
+	
+	/**
+	 * @return integer of the cost travel across this edge
+	 */
+	public int getWeight(){
+		return weight;
+	}
+		
+	/*
+	public boolean equals(Edge other){
+		if(this.equals(other)){
+			return true;
+		}else{
+			return false;
+		}
+	}
+*/
+	
+	@Override
+	/**
+	 * Returns formatted output according to the spec
+	 */
+	public String toString() {
+		return t1.getName() + " to " + t2.getName();
+	}
+	
+	/**
+	 * Return hash code for this edge
+	 * Takes the name of the head and tail vertices and creates a hash code
+	 */
+	public int hashCode(){
+		return(t1.getName() + t2.getName()).hashCode();
+	}
+	
 	public Town getNeighbour(Town reference){
 		Town neighbour;
 		
@@ -28,58 +80,4 @@ public class Edge implements Comparable<Edge> {
 		}
 		return neighbour;
 	}
-	
-	//t1(head)
-	public Town getHead(){
-		return t1;
-	}
-
-	//t2(tail)
-	public Town getTail(){
-		return t2;
-	}
-	
-	public int getWeight(){
-		return weight;
-	}
-	
-	public boolean weightGreater(Edge other){
-		if(weight - other.getWeight() >= 0){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
-	public boolean equals(Edge other){
-
-		if(this.getHead().equals(other.getHead()) && this.getTail().equals(other.getTail())){
-			return true;
-		}else{
-			return false;
-		}
-	}
-
-	@Override
-	public String toString() {
-		return t1.getName() + " to " + t2.getName();
-	}
-	
-	/**
-	 * Return hash code for this edge
-	 */
-	public int hashCode(){
-		return(t1.getName() + t2.getName()).hashCode();
-	}
-
-
-	@Override
-	public int compareTo(Edge e) {
-		if(this.equals(e)){
-			return 0;
-		}else{
-			return 1;
-		}
-	}
-	
 }

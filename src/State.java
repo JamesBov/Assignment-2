@@ -1,15 +1,29 @@
 import java.util.ArrayList;
 import java.util.Comparator;
 
+/**
+ * Search instance up to a particular edge. 
+ * i.e. A state holds all edges(steps) taken to reach this state running
+ * on the A* search algorithm. 
+ * 
+ * Also holds the remaining jobs that have yet to be completed
+ * 
+ * Priority queue in AStarSearch corresponds to the fCost.
+ */
 public class State implements Comparable<State>{
+	private ArrayList<Edge> remainingJobs;
 	private int gCost;
 	private int fCost;
 	private int hCost;
 	
 	private ArrayList<Edge> stepsTaken;
 	
+	/**
+	 * State constructor, takes in remainingJobs and stepsTaken to reach this edge
+	 */
 	public State(){
 		this.stepsTaken = new ArrayList<Edge>();
+		this.remainingJobs = new ArrayList<Edge>();
 	}
 	
 	@Override
@@ -38,8 +52,8 @@ public class State implements Comparable<State>{
 		return fCost;
 	}
 	
-	public void setfCost(int fCost){
-		this.fCost = fCost;
+	public void calcfCost(){
+		this.fCost = gCost + hCost;
 	}
 
 	public int getgCost() {
@@ -62,7 +76,29 @@ public class State implements Comparable<State>{
 		return stepsTaken;
 	}
 	
-	public void copyStepsTaken(ArrayList<Edge> steps){
-			stepsTaken = new ArrayList<Edge>(steps);
+	public ArrayList<Edge> getRemainingJobs(){
+		return remainingJobs;
 	}
+	
+	/**
+	 * Copies over all steps Taken and generates a new array to hold this data
+	 * @param steps
+	 */
+	public void copyStepsTaken(ArrayList<Edge> steps){
+		stepsTaken = new ArrayList<Edge>(steps);
+	}
+	
+	/**
+	 * Copies over all remaining jobs and generates a new array to hold this dataa
+	 * @param jobs
+	 */
+	public void copyJobList(ArrayList<Edge> jobs){
+		if(jobs.isEmpty()){
+			remainingJobs = new ArrayList<Edge>();
+			return;
+		}
+		remainingJobs = new ArrayList<Edge>(jobs);
+	}
+	
+
 }

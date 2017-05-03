@@ -6,58 +6,77 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+/**
+ * The main algorithm used for the path finding for optimal route that satisfies all job requirements
+ * Strategy pattern simply sets what heuristic to use by calling setStrategy(Strategy s), and 
+ * will accordingly execute an A* search with the respective heuristic
+ */
 public class AStarSearch{
 
-	private Graph graph;
 	private int nodesExpanded = 0;
 	private int pathCost = 0;
-	private ArrayList<Town> path = null;
 	private Strategy strategy;
 	private ArrayList<Edge> jobList;
 	
-	public AStarSearch(Graph g, ArrayList<Edge> jobList){
-		this.graph = g;
-		this.path = new ArrayList<Town>();
+	public AStarSearch(ArrayList<Edge> jobList){
 		this.jobList = jobList;
 	}
 	
 	
 	/**
-	 * Take the starting point at Sydney
 	 * Execute A* Search until we arrive at a goal state that contains all the jobs
-	 * @param start
+	 * New states will be generated for any new connection (edge) and added onto the priority queue
+	 * Polling the priority queue returns the associated state with the smallest fCost
+	 * @param Starting location passed as a parameter
 	 * @return Optimal path
 	 */
 	public ArrayList<Edge> findPath(Town start){
 		
-		List<Town> closed = new ArrayList<Town>();
 		Queue<State> queue = new PriorityQueue<State>();
 		
-		//Initialise a dummy start state
+		// Initialize a dummy start state
 		State startState = new State();
-		startState.setfCost(0);
 		startState.addEdge(new Edge(new Town("Dummy", 0), start, 0));
 		
 		queue.add(startState);
 		
+		
+		
 		while(!queue.isEmpty()){
 			
 			State curr = queue.poll();
-			//System.out.println(curr.getStepsTaken());
 			nodesExpanded++;
 
-			if(isSubset(jobList, curr)){
+			if(nodesExpanded >= 500){
 				return curr.getStepsTaken();
 			}
+			
+			if(isSubset(jobList, curr)){
+				pathCost = curr.getgCost();
+				return curr.getStepsTaken();
+			}
+			/*
+			
+			if(curr.getRemainingJobs().isEmpty() && !curr.equals(startState)){
+				return curr.getStepsTaken();
+			}
+			*/
 						
 			for(Edge edge : curr.getStateHead().getConnections()){	
 					
 				State newState = new State();
-				
+
+				if(jobList.contains(edge)){
+					curr.getRemainingJobs().remove(edge);
+				}
+
 				//Handles the dummy intial start state
 				if(curr.equals(startState) && edge.getHead().equals(start)){
 					newState.addEdge(edge);
+					newState.copyJobList(jobList);
 				}else{
+
+					newState.copyJobList(curr.getRemainingJobs());
 					newState.copyStepsTaken(curr.getStepsTaken());
 					
 					if(newState.getStateHead().equals(edge.getTail())){
@@ -66,10 +85,11 @@ public class AStarSearch{
 					}
 					newState.addEdge(edge);
 				}
-				
+								
 				newState.setgCost(curr.getgCost() + edge.getWeight());
-				newState.setfCost(newState.getgCost() + 0);
-
+				newState.sethCost(heuristicEst(newState));
+				newState.calcfCost();
+				
 				if(!queue.contains(newState)){
 					queue.add(newState);
 				}
@@ -82,29 +102,50 @@ public class AStarSearch{
 		
 	}
 		
+	
+	/**
+	 * Sets the strategy for the A* search heuristic
+	 * @param s
+	 */
 	public void setStrategy(Strategy s){
 		this.strategy = s;
 	}
 	
-	public ArrayList<Town> getPath(){
-		return this.path;
-	}
 	
-	public int heuristicEst(Town start, Town dest){
-		//Use dijkstra's
-		int cost = 0;
-
-		return cost;
+	/**
+	 * Estimates the heuristic cost to reach the goal state by running another search instance but
+	 * under a heuristic set to 0 (Dijkstra's search)
+	 * More details in StraightLineStrategy class
+	 * @param state s
+	 * @return heuristic estimate
+	 */
+	public int heuristicEst(State s){	
+		return strategy.getHeuristicEst(s);
 	}
 
+	/**
+	 * get total number of nodes expanded
+	 * @return integer of expanded nodes
+	 */
 	public int getNodesExpanded() {
 		return nodesExpanded;
 	}
 	
+	/**
+	 * get total path cost
+	 * @return integer of total cost
+	 */
 	public int getPathCost(){
 		return pathCost;
 	}
 	
+	/**
+	 * Determines whether the jobList is a subset of state
+	 * 
+	 * @param jobList - List of edges that have jobs
+	 * @param state - State which holds all the previous edges taken
+	 * @return
+	 */
 	private boolean isSubset(ArrayList<Edge> jobList, State state){
 		boolean status = false;
 		for(Edge job : jobList){
