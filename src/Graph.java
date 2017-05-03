@@ -27,25 +27,10 @@ public class Graph {
 	 * @param (Vertex 1, Vertex 2)
 	 */
 	public boolean canAddEdge(Edge newEdge){
-		/*
-		if(v1.equals(v2)){
-			return false;
-		}
-		
-		Edge newEdge = new Edge(v1, v2, weight);
-		*/
-		if(edges.containsKey(newEdge.hashCode())){
+
+		if(edges.containsKey(newEdge.hashCode()))
 			return false;
 			
-			/*
-		// Edge already has been assigned to a vertex
-		}else if(v1.containsConnection(newEdge) || v2.containsConnection(newEdge)){
-			return false;
-			*/
-		}
-		
-		
-		// If edge passes all the above tests then add edge to graph
 		addEdge(newEdge);
 		return true;
 	}
@@ -62,7 +47,7 @@ public class Graph {
 	}
 	
 	/**
-	 * If edge is in graph
+	 * Check if edge exists in graph
 	 * @param e
 	 * @return
 	 */
@@ -70,14 +55,29 @@ public class Graph {
 		return edges.containsKey(e.hashCode());
 	}
 	
+	/**
+	 * Check if vertex exists in graph
+	 * @param v
+	 * @return
+	 */
 	public boolean containsVertex(Town v){
 		return vertices.containsValue(v);
 	}
 	
+	/**
+	 * Returns a vertex given a string
+	 * @param String of the vertex name
+	 * @return
+	 */
 	public Vertex getVertex(String name){
 		return vertices.get(name);
 	}
 	
+	/**
+	 * Check if possible to add vertex to graph
+	 * @param v
+	 * @return
+	 */
 	public boolean canAddVertex(Town v){
 		if(v == null){
 			return false;
@@ -87,14 +87,26 @@ public class Graph {
 		return true;
 	}
 	
+	/**
+	 * Add vertex v to the graph
+	 * @param v
+	 */
 	public void addVertex(Town v){
 		vertices.put(v.getName(), v);
 	}
 	
+	/**
+	 * Return set of keys for the vertices map
+	 * @return
+	 */
 	public Set<String> getVertexKeys(){
 		return vertices.keySet();
 	}
 	
+	/**
+	 * Return a set of keys for the edges map
+	 * @return
+	 */
 	public Set<Edge> getEdgeKeys(){
 		return new HashSet<Edge>(edges.values());
 	}

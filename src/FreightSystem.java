@@ -20,15 +20,14 @@ import java.util.regex.Pattern;
  * @author James Zhang
  * @zID: z5062479 
  *
-
  */
 public class FreightSystem {
 	
 	static ArrayList<Edge> jobList = new ArrayList<Edge>();
 	static ArrayList<Town> townList = new ArrayList<Town>();
 	static ArrayList<Edge> edgeList = new ArrayList<Edge>();
+	
 	static boolean hasSolution = true;
-	static int cost = 0;
 	static Graph graph = null;
 	
 	public static void main(String[] args) {		
@@ -53,16 +52,16 @@ public class FreightSystem {
 	      // Send to input handler
 	      input_handler(input);
 	      generateGraph();
-	      pathFind();
+	      initiateSearch();
 	}
 	
 	
-	/**
-	 * Calls the strategy pattern via the searchContext
-	 * Collects data and sends to outputHandler
-	 * Ensures there is a valid path, i.e. all jobs are edges in edgeList
+	/* Runtime analysis of StraightLineHeuristic
+	 * 
+	 * 
+	 * 
 	 */
-	public static void pathFind(){
+	private static void initiateSearch(){
 		
 		if(hasSolution() == false){
 			System.out.println("No Solution");
@@ -83,7 +82,7 @@ public class FreightSystem {
 	 * @param integer - nodesExpanded
 	 * @param ArrayList of edges - path
 	 */
-	public static void outputHandler(int nodesExpanded, ArrayList<Edge> path){
+	private static void outputHandler(int nodesExpanded, ArrayList<Edge> path){
 		
 		int totalCost = 0;
 		ArrayList<String> output = new ArrayList<String>();
@@ -115,7 +114,7 @@ public class FreightSystem {
 	 * Returns town under "Sydney"
 	 * @return
 	 */
-	public static Town getStartTown(){
+	private static Town getStartTown(){
 		for(Town t : townList){
 			if(t.getName().equals("Sydney")){
 				return t;
@@ -130,7 +129,7 @@ public class FreightSystem {
 	 * Handles these details in their respective handlers
 	 * @param input
 	 */
-	public static void input_handler(ArrayList<String> input){
+	private static void input_handler(ArrayList<String> input){
 				
 		for(String element : input){
 			
@@ -156,7 +155,7 @@ public class FreightSystem {
 	 * Initializes towns and sets unload costs
 	 * @param String with associated data
 	 */
-	public static void unloadHandler(String element) {
+	private static void unloadHandler(String element) {
 		String[] parts = element.split(Pattern.quote(" "));
 		
 		int unloadCost = Integer.parseInt(parts[1]);
@@ -170,7 +169,7 @@ public class FreightSystem {
 	 * Initializes edges and sets the distance costs
 	 * @param String with associated data
 	 */
-	public static void costHandler(String element){
+	private static void costHandler(String element){
 		String[] parts = element.split(Pattern.quote(" "));
 		
 		int travelCost = Integer.parseInt(parts[1]);
@@ -203,7 +202,7 @@ public class FreightSystem {
 	 * Added to jobList afterwards
 	 * @param String with associated data
 	 */
-	public static void jobHandler(String element){
+	private static void jobHandler(String element){
 		String[] parts = element.split(Pattern.quote(" "));
 		
 		String head = parts[1];
@@ -237,7 +236,7 @@ public class FreightSystem {
 	/**
 	 * Generate the graph from the input
 	 */
-	public static void generateGraph(){
+	private static void generateGraph(){
 		graph = newGraph();
 		generateEdges(graph);
 	}
@@ -246,7 +245,7 @@ public class FreightSystem {
 	 * Initializes a graph from a list of towns (Vertices)
 	 * @return
 	 */
-	public static Graph newGraph(){
+	private static Graph newGraph(){
 		Graph newGraph = new Graph(townList);
 		return newGraph;
 	}
@@ -255,7 +254,7 @@ public class FreightSystem {
 	 * Generate all edges from the edgeList
 	 * @param g
 	 */
-	public static void generateEdges(Graph g){
+	private static void generateEdges(Graph g){
 		for(Edge edge : edgeList){
 			g.addEdge(edge);
 		}
@@ -268,7 +267,7 @@ public class FreightSystem {
 	 * Check otherwise, and ensure no jobs are in the disconnected regions
 	 * @param curr
 	 */
-	static void DFS(Town curr){
+	private static void DFS(Town curr){
 		visited.add(curr);
 		
 		for(Edge connection : curr.getAllConnections()){
@@ -285,7 +284,7 @@ public class FreightSystem {
 	 * @param graph
 	 * @return boolean
 	 */
-	static boolean hasSolution(){
+	private static boolean hasSolution(){
 		boolean flag = true;
 		DFS(getStartTown());
 		

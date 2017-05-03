@@ -41,17 +41,7 @@ public class Edge{
 	public int getWeight(){
 		return weight;
 	}
-		
-	/*
-	public boolean equals(Edge other){
-		if(this.equals(other)){
-			return true;
-		}else{
-			return false;
-		}
-	}
-*/
-	
+			
 	@Override
 	/**
 	 * Returns formatted output according to the spec

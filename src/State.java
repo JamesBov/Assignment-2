@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Comparator;
 
 /**
  * Search instance up to a particular edge. 
@@ -89,7 +88,7 @@ public class State implements Comparable<State>{
 	}
 	
 	/**
-	 * Copies over all remaining jobs and generates a new array to hold this dataa
+	 * Copies over all remaining jobs and generates a new array to hold this data
 	 * @param jobs
 	 */
 	public void copyJobList(ArrayList<Edge> jobs){

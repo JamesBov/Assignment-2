@@ -28,6 +28,10 @@ public class SearchContext {
 		nodesExpanded = searchInstance.getNodesExpanded();
 	}
 	
+	/**
+	 * Return a path found by the strategy executed
+	 * @return
+	 */
 	public ArrayList<Edge> getPath(){
 		return path;
 	}

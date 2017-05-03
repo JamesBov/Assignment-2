@@ -9,8 +9,6 @@ public class Vertex{
 		this.connections = new ArrayList<Edge>();
 	}
 	
-
-	
 	/**
 	 * Adds an edge adjacent vertices of this graph if and only if not already present
 	 */
@@ -21,10 +19,18 @@ public class Vertex{
 		this.connections.add(e);
 	}
 	
+	/**
+	 * Returns a list of edges that contain this vertex
+	 * @return
+	 */
 	public ArrayList<Edge> getAllConnections(){
 		return connections;
 	}
 
+	/**
+	 * Return unload cost of when a job finishes at this vertex
+	 * @return
+	 */
 	public int getUnloadCost() {
 		return unloadCost;
 	}

@@ -1,0 +1,29 @@
+Unloading 0 Sydney
+Unloading 0 Tatooine
+Unloading 0 Alderaan
+Unloading 0 Bespin
+Unloading 0 Jedha
+Unloading 0 DeathStar
+Unloading 0 Hoth
+Cost 15 Sydney Tatooine
+Cost 15 Sydney Alderaan
+Cost 20 Tatooine Jedha
+Cost 15 Jedha Hoth
+Cost 15 Hoth Bespin
+Cost 20 Bespin Alderaan
+Cost 5 DeathStar Sydney
+Cost 5 DeathStar Tatooine
+Cost 5 DeathStar Alderaan
+Cost 5 DeathStar Bespin
+Cost 5 DeathStar Jedha
+Job Sydney Alderaan
+Job Sydney Tatooine
+Job Alderaan Bespin
+Job Tatooine Jedha
+Job Bespin Hoth
+Job Jedha Hoth
+Job DeathStar Sydney
+Job DeathStar Tatooine
+Job DeathStar Alderaan
+Job DeathStar Bespin
+Job DeathStar Jedha

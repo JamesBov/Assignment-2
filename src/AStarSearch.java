@@ -40,35 +40,38 @@ public class AStarSearch{
 		
 		queue.add(startState);
 		
+		ArrayList<State> closed = new ArrayList<State>();
 		
 		
 		while(!queue.isEmpty()){
 			
 			State curr = queue.poll();
+			
+			closed.add(curr);
+			
 			nodesExpanded++;
 
-			if(nodesExpanded >= 500){
+			
+			if(nodesExpanded >= 1000000){
 				return curr.getStepsTaken();
 			}
+
+			
 			
 			if(isSubset(jobList, curr)){
 				pathCost = curr.getgCost();
 				return curr.getStepsTaken();
 			}
-			/*
+			
 			
 			if(curr.getRemainingJobs().isEmpty() && !curr.equals(startState)){
 				return curr.getStepsTaken();
 			}
-			*/
 						
 			for(Edge edge : curr.getStateHead().getConnections()){	
 					
 				State newState = new State();
 
-				if(jobList.contains(edge)){
-					curr.getRemainingJobs().remove(edge);
-				}
 
 				//Handles the dummy intial start state
 				if(curr.equals(startState) && edge.getHead().equals(start)){
@@ -85,14 +88,18 @@ public class AStarSearch{
 					}
 					newState.addEdge(edge);
 				}
+				
+				if(jobList.contains(edge)){
+					newState.getRemainingJobs().remove(edge);
+				}
 								
 				newState.setgCost(curr.getgCost() + edge.getWeight());
-				newState.sethCost(heuristicEst(newState));
+				newState.sethCost(0);
 				newState.calcfCost();
 				
-				if(!queue.contains(newState)){
+				//if(!queue.contains(newState)){
 					queue.add(newState);
-				}
+				//}
 			}
 			
 			
