@@ -1,0 +1,93 @@
+	public ArrayList<Edge> findPath(Town start){
+		
+		Queue<State> queue = new PriorityQueue<State>();
+		
+		
+		// Initialize a dummy start state
+		State startState = new State();
+		startState.addEdge(new Edge(new Town("Dummy", 0), start, 0));
+		
+		queue.add(startState);
+		
+		ArrayList<State> closed = new ArrayList<State>();
+		
+		
+		while(!queue.isEmpty()){
+			
+			State curr = queue.poll();
+			closed.add(curr);
+
+			nodesExpanded++;
+			
+			/*
+			if(nodesExpanded >= 1000){
+				return curr.getStepsTaken();
+			}
+			*/
+
+			
+			if(isSubset(jobList, curr)){
+				pathCost = curr.getgCost();
+				return curr.getStepsTaken();
+			}
+			
+			
+			/*
+			if(curr.getRemainingJobs().isEmpty() && !curr.equals(startState)){
+				return curr.getStepsTaken();
+			}
+			*/
+						
+			for(Edge edge : curr.getStateHead().getConnections()){	
+					
+				State newState = new State();
+				
+				//Handles the dummy intial start state			
+				if(curr.equals(startState) && edge.getHead().equals(start)){
+					newState.addEdge(edge);
+					newState.copyJobList(jobList);
+				}else{
+					newState.copyJobList(curr.getRemainingJobs());
+					newState.copyStepsTaken(curr.getStepsTaken());
+					
+					if(!newState.getStateHead().equals(edge.getHead())){
+						newState = null;
+						continue;
+					}
+					
+					newState.addEdge(edge);
+				}
+				
+
+				//System.out.println(newState.getStepsTaken());
+
+				newState.setgCost(curr.getgCost() + edge.getWeight());
+				newState.sethCost(0);
+				newState.calcfCost();
+
+
+				if(jobList.contains(edge)){
+					newState.getRemainingJobs().remove(edge);
+				}
+				
+				//if(withinClosed(closed, newState)){
+				if(closed.contains(newState)){
+				//System.out.println("hi");
+					//closed.remove(closedS);
+					//queue.add(newState);
+					continue;
+				}else if(withinOpen(queue, newState)){
+					//System.out.println("hi");
+					
+					removeFromQueue(openS, queue);
+					queue.add(newState);
+					continue;
+				}else if(!withinOpen(queue, newState)){
+					//System.out.println("hi");	
+					queue.add(newState);
+				}	
+			}
+		}
+		//Fail
+		return null;
+	}

@@ -15,13 +15,14 @@ public class State implements Comparable<State>{
 	private int fCost;
 	private int hCost;
 	
-	private ArrayList<Edge> stepsTaken;
+	//private ArrayList<Edge> stepsTaken;
+	private State prevState;
 	
 	/**
 	 * State constructor, takes in remainingJobs and stepsTaken to reach this edge
 	 */
-	public State(){
-		this.stepsTaken = new ArrayList<Edge>();
+	public State(State p){
+		this.prevState = p;
 		this.remainingJobs = new ArrayList<Edge>();
 	}
 	
@@ -98,6 +99,44 @@ public class State implements Comparable<State>{
 		}
 		remainingJobs = new ArrayList<Edge>(jobs);
 	}
-	
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + fCost;
+		result = prime * result + gCost;
+		result = prime * result + hCost;
+		result = prime * result + ((remainingJobs == null) ? 0 : remainingJobs.hashCode());
+		result = prime * result + ((stepsTaken == null) ? 0 : stepsTaken.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		State other = (State) obj;
+		if (fCost != other.fCost)
+			return false;
+		if (gCost != other.gCost)
+			return false;
+		if (hCost != other.hCost)
+			return false;
+		if (remainingJobs == null) {
+			if (other.remainingJobs != null)
+				return false;
+		} else if (!remainingJobs.equals(other.remainingJobs))
+			return false;
+		if (stepsTaken == null) {
+			if (other.stepsTaken != null)
+				return false;
+		} else if (!stepsTaken.equals(other.stepsTaken))
+			return false;
+		return true;
+	}
 }

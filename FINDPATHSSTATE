@@ -1,0 +1,88 @@
+	public ArrayList<Edge> findPath(Town start){
+		
+		Queue<State> queue = new PriorityQueue<State>();
+		
+		// Initialize a dummy start state
+		State startState = new State();
+		startState.addEdge(new Edge(new Town("Dummy", 0), start, 0));
+		
+		queue.add(startState);
+		
+		ArrayList<State> closed = new ArrayList<State>();
+		
+		
+		while(!queue.isEmpty()){
+			
+			State curr = queue.poll();
+						
+			nodesExpanded++;
+
+			
+			if(nodesExpanded >= 10000){
+				return curr.getStepsTaken();
+			}
+
+			if(isSubset(jobList, curr)){
+				pathCost = curr.getgCost();
+				return curr.getStepsTaken();
+			}
+			
+			
+			if(curr.getRemainingJobs().isEmpty() && !curr.equals(startState)){
+				return curr.getStepsTaken();
+			}
+						
+			for(Edge edge : curr.getStateHead().getConnections()){	
+					
+				State newState = new State();
+
+
+				//Handles the dummy intial start state
+				if(curr.equals(startState) && edge.getHead().equals(start)){
+					newState.addEdge(edge);
+					newState.copyJobList(jobList);
+				}else{
+
+					newState.copyJobList(curr.getRemainingJobs());
+					newState.copyStepsTaken(curr.getStepsTaken());
+					
+					if(newState.getStateHead().equals(edge.getTail())){
+						newState = null;
+						continue;
+					}
+					newState.addEdge(edge);
+				}
+				
+				/*
+				if(closed.contains(newState)){
+					if(newState.getfCost() <= curr.getfCost()){
+						closed.remove(newState);
+						queue.add(curr);
+					}
+				}else if(queue.contains(newState))
+					if(newState.getfCost() <= curr.getfCost()){
+						
+				}else if(!queue.contains(newState)){
+					queue.add(newState);
+				}
+				*/
+				
+				
+				if(jobList.contains(edge)){
+					newState.getRemainingJobs().remove(edge);
+				}
+								
+				newState.setgCost(curr.getgCost() + edge.getWeight());
+				newState.sethCost(0);
+				newState.calcfCost();
+				
+				queue.add(newState);
+				
+			}
+			
+			
+		}
+		//Fail
+		return null;
+		
+	}

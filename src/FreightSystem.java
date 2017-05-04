@@ -74,6 +74,9 @@ public class FreightSystem {
 		ArrayList<Edge> path = context.getPath();
 		int nodesExpanded = context.getExpandedNodes();
 		
+		//System.out.println(path);
+		//System.exit(1);
+		
 		outputHandler(nodesExpanded, path);	
 	}
 	
@@ -98,8 +101,6 @@ public class FreightSystem {
 				totalCost += e.getWeight();
 			}
 		}
-		
-		
 		// Print
 		System.out.println(nodesExpanded + " " + "nodes expanded");
 		System.out.println("cost = " + totalCost);
