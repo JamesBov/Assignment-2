@@ -53,6 +53,7 @@ public class AStarSearch{
 			State curr = queue.poll();
 			
 			if(!curr.equals(startState)){
+				//closed.put(curr, );
 			}
 
 			nodesExpanded++;
