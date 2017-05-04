@@ -15,7 +15,8 @@ public class State implements Comparable<State>{
 	private int fCost;
 	private int hCost;
 	
-	private ArrayList<Edge> stepsTaken;
+	private Edge Head;
+	private State prev;
 	
 	/**
 	 * State constructor, takes in remainingJobs and stepsTaken to reach this edge

@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -18,10 +19,12 @@ public class AStarSearch{
 	private Strategy strategy;
 	private ArrayList<Edge> jobList;
 	
+	private State openS;
+	private State closedS;
+	
 	public AStarSearch(ArrayList<Edge> jobList){
 		this.jobList = jobList;
 	}
-	
 	
 	/**
 	 * Execute A* Search until we arrive at a goal state that contains all the jobs
@@ -34,29 +37,32 @@ public class AStarSearch{
 		
 		Queue<State> queue = new PriorityQueue<State>();
 		
+		
 		// Initialize a dummy start state
 		State startState = new State();
 		startState.addEdge(new Edge(new Town("Dummy", 0), start, 0));
 		
 		queue.add(startState);
 		
-		ArrayList<State> closed = new ArrayList<State>();
+		HashMap<State, Integer> closed = new HashMap<State, Integer>();
+		//ArrayList<State> closed = new ArrayList<State>();
 		
 		
 		while(!queue.isEmpty()){
 			
 			State curr = queue.poll();
 			
-			closed.add(curr);
-			
-			nodesExpanded++;
-
-			
-			if(nodesExpanded >= 1000000){
-				return curr.getStepsTaken();
+			if(!curr.equals(startState)){
 			}
 
+			nodesExpanded++;
 			
+			/*
+			if(nodesExpanded >= 1000){
+				return curr.getStepsTaken();
+			}
+			*/
+
 			
 			if(isSubset(jobList, curr)){
 				pathCost = curr.getgCost();
@@ -64,51 +70,144 @@ public class AStarSearch{
 			}
 			
 			
+			
 			if(curr.getRemainingJobs().isEmpty() && !curr.equals(startState)){
 				return curr.getStepsTaken();
 			}
+			
 						
 			for(Edge edge : curr.getStateHead().getConnections()){	
 					
 				State newState = new State();
-
-
-				//Handles the dummy intial start state
+				
+				//Handles the dummy intial start state			
 				if(curr.equals(startState) && edge.getHead().equals(start)){
 					newState.addEdge(edge);
 					newState.copyJobList(jobList);
 				}else{
-
 					newState.copyJobList(curr.getRemainingJobs());
 					newState.copyStepsTaken(curr.getStepsTaken());
 					
-					if(newState.getStateHead().equals(edge.getTail())){
+					if(!newState.getStateHead().equals(edge.getHead())){
 						newState = null;
 						continue;
 					}
+					
 					newState.addEdge(edge);
 				}
 				
-				if(jobList.contains(edge)){
-					newState.getRemainingJobs().remove(edge);
-				}
-								
+
+				//System.out.println(newState.getStepsTaken());
+
 				newState.setgCost(curr.getgCost() + edge.getWeight());
 				newState.sethCost(0);
 				newState.calcfCost();
+
+
+				if(jobList.contains(edge)){
+					newState.getRemainingJobs().remove(edge);
+				}
 				
-				//if(!queue.contains(newState)){
+				if(withinClosed(closed, newState)){
+				//if(closed.contains(newState)){
+				//System.out.println("hi");
+					closed.remove(closedS);
 					queue.add(newState);
-				//}
+					continue;
+				}else if(withinOpen(queue, newState)){
+					//System.out.println("hi");
+					
+					removeFromQueue(openS, queue);
+					queue.add(newState);
+					continue;
+				}else if(!withinOpen(queue, newState)){
+					//System.out.println("hi");	
+					queue.add(newState);
+				}	
 			}
-			
-			
 		}
 		//Fail
 		return null;
-		
 	}
+	
+	public void removeFromQueue(State s, Queue<State> queue){
 		
+		Iterator<State> iter = queue.iterator();
+		//System.out.println(queue);
+		
+		while(iter.hasNext()){
+			State current = iter.next();
+
+			if(current.equals(s)){
+				iter.remove();
+			}
+		}
+	}
+	
+	public boolean withinClosed(ArrayList<State> closed, State newState){
+		boolean state = false;
+		
+		for(State s : closed){
+			if(s.getStateHead().equals(newState.getStateHead())){
+				state = true;
+				
+				if(newState.getfCost() < s.getfCost()){
+					closedS = s;
+				}
+			}
+		}
+		return state;
+	}
+	
+	public boolean withinOpen(Queue<State> open, State newState){
+			
+		boolean state = false;
+		for(State s : open){
+			if(s.getStateHead().equals(newState.getStateHead())){
+				
+				state = true;
+				
+				if(newState.getfCost() < s.getfCost()){	
+					openS = s;
+				}
+			}		
+		}
+		return state;
+	}
+	
+	
+	
+	/**
+	 * True if successor is better option
+	 * false if there is a better state in closed
+	 * @param closed
+	 * @param successor
+	 * @return
+	 */
+	
+	/*
+	public boolean isClosedSuccessor(ArrayList<State> closed, Queue<State> open, State successor){
+		
+		for(State s : closed){
+			if(s.getStateHead().equals(successor.getStateHead())){
+				if(s.getfCost() > successor.getfCost())
+					
+					return false;
+			}
+		}
+		return true;
+	}
+	
+	public boolean isOpenSuccessor(Queue<State> open, State successor){		
+		for(State s : open){
+			if(s.getStateHead().equals(successor.getStateHead())){
+				if(s.getfCost() < successor.getfCost())
+					return false;
+			}
+		}
+		return true;
+	}
+	*/
 	
 	/**
 	 * Sets the strategy for the A* search heuristic
