@@ -16,8 +16,6 @@ public class State implements Comparable<State>{
 	private int hCost;
 	
 	private Edge head;
-
-
 	private State prev;
 	
 	/**
