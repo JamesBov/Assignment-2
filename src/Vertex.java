@@ -35,4 +35,31 @@ public class Vertex{
 		return unloadCost;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((connections == null) ? 0 : connections.hashCode());
+		result = prime * result + unloadCost;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Vertex other = (Vertex) obj;
+		if (connections == null) {
+			if (other.connections != null)
+				return false;
+		} else if (!connections.equals(other.connections))
+			return false;
+		if (unloadCost != other.unloadCost)
+			return false;
+		return true;
+	}
 }

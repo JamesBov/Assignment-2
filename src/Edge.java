@@ -5,6 +5,8 @@
  *
  */
 public class Edge{
+	
+
 	private Town t1, t2;
 	private int weight;
 	
@@ -50,12 +52,14 @@ public class Edge{
 		return t1.getName() + " to " + t2.getName();
 	}
 	
-	/**
-	 * Return hash code for this edge
-	 * Takes the name of the head and tail vertices and creates a hash code
-	 */
-	public int hashCode(){
-		return(t1.getName() + t2.getName()).hashCode();
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((t1 == null) ? 0 : t1.hashCode());
+		result = prime * result + ((t2 == null) ? 0 : t2.hashCode());
+		result = prime * result + weight;
+		return result;
 	}
 	
 	public Town getNeighbour(Town reference){
@@ -69,5 +73,29 @@ public class Edge{
 			neighbour = null;
 		}
 		return neighbour;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Edge other = (Edge) obj;
+		if (t1 == null) {
+			if (other.t1 != null)
+				return false;
+		} else if (!t1.equals(other.t1))
+			return false;
+		if (t2 == null) {
+			if (other.t2 != null)
+				return false;
+		} else if (!t2.equals(other.t2))
+			return false;
+		if (weight != other.weight)
+			return false;
+		return true;
 	}
 }
